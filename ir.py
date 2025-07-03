@@ -19,7 +19,7 @@ class IR_Recorder:
         self.last_tick = tick
 
         # Debug: in mọi xung nhận được
-        print(f"[DEBUG] dt={dt} μs")
+        # print(f"[DEBUG] dt={dt} μs")
 
         # Header (~9ms)
         if 8000 <= dt <= 10000:
