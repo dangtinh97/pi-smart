@@ -3,3 +3,4 @@ uvicorn
 #SpeechRecognition
 #PyAudio
 GPIO
+RPi.GPIO
