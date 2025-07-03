@@ -27,8 +27,7 @@ setup_ir()
 def read_ir():
     if GPIO.input(config_pinout.GPIO_IR_RECEIVER) == GPIO.LOW:
         print("IR nhận tín hiệu")
-while True:
-    read_ir()
+read_ir()
 
 # with sr.Microphone() as source:
 #     print("Bắt đầu nhận giọng nói... (Ctrl+C để dừng)")
