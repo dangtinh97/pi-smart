@@ -30,7 +30,14 @@ def read_ir():
         print("IR nhận tín hiệu")
     print("Đang lắng nghe IR trong 5 giây...")
     time.sleep(5)
-read_ir()
+# read_ir()
+
+def ir_callback(channel):
+    print(">> Nhận tín hiệu IR tại", time.strftime('%H:%M:%S'))
+
+# Lắng nghe cạnh FALLING (khi có tín hiệu IR)
+GPIO.add_event_detect(IR_PIN, GPIO.FALLING, callback=ir_callback, bouncetime=200)
+
 
 # with sr.Microphone() as source:
 #     print("Bắt đầu nhận giọng nói... (Ctrl+C để dừng)")
