@@ -1,5 +1,8 @@
 # Pi Smart
 
+## Install
+
+
 ## Project
 ```plaintext
 pi-smart/
