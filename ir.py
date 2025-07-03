@@ -18,21 +18,23 @@ class IR_NEC_Listener:
         dt = pigpio.tickDiff(self.last_tick, tick)
         self.last_tick = tick
 
-        if 8000 <= dt <= 10000:  # Header ~9ms
+        # Header NEC: khoảng 9ms
+        if 7000 <= dt <= 12000:
+            print(f"[DEBUG] HEADER STARTED (dt = {dt} µs)")
             self.in_code = True
             self.bits = 0
             self.code = 0
             return
 
         if self.in_code:
-            if 200 <= dt <= 900:         # Bit 0
+            if 200 <= dt <= 900:          # Bit 0
                 self.code = (self.code << 1) | 0
                 self.bits += 1
-            elif 1000 <= dt <= 2500:     # Bit 1
+            elif 1000 <= dt <= 2500:      # Bit 1
                 self.code = (self.code << 1) | 1
                 self.bits += 1
             else:
-                # Xung lỗi, reset chuỗi
+                print(f"[DEBUG] Invalid pulse: dt = {dt} µs → Reset")
                 self.in_code = False
                 self.bits = 0
                 self.code = 0
@@ -54,14 +56,14 @@ def main():
     pi.set_mode(IR_GPIO, pigpio.INPUT)
     pi.set_pull_up_down(IR_GPIO, pigpio.PUD_UP)
 
-    print(f">> Đang lắng nghe tín hiệu IR trên GPIO {IR_GPIO}. Bấm nút trên remote...")
+    print(f">> Đang lắng nghe tín hiệu IR trên GPIO {IR_GPIO}. Nhấn 1 lần nút remote...")
     listener = IR_NEC_Listener(pi, IR_GPIO)
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n>> Dừng.")
+        print("\n>> Dừng chương trình.")
     finally:
         pi.stop()
 
