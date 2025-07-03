@@ -36,7 +36,7 @@ def ir_callback(channel):
     print(">> Nhận tín hiệu IR tại", time.strftime('%H:%M:%S'))
 
 # Lắng nghe cạnh FALLING (khi có tín hiệu IR)
-GPIO.add_event_detect(IR_PIN, GPIO.FALLING, callback=ir_callback, bouncetime=200)
+GPIO.add_event_detect(config_pinout.GPIO_IR_RECEIVER, GPIO.FALLING, callback=ir_callback, bouncetime=200)
 
 
 # with sr.Microphone() as source:
