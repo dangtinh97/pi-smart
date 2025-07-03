@@ -4,45 +4,43 @@ import config_pinout
 
 IR_GPIO = config_pinout.GPIO_IR_RECEIVER
 
-class IR_DebugLogger:
+class IR_NEC_Listener:
     def __init__(self, pi, gpio):
         self.pi = pi
         self.gpio = gpio
         self.last_tick = 0
-        self.pulses = []
-
-        # Đăng ký callback bắt mọi cạnh (cả lên và xuống)
-        self.cb = pi.callback(gpio, pigpio.EITHER_EDGE, self._cb)
+        self.bits = 0
+        self.code = 0
+        self.in_code = False
+        self.cb = pi.callback(gpio, pigpio.FALLING_EDGE, self._cb)
 
     def _cb(self, gpio, level, tick):
         dt = pigpio.tickDiff(self.last_tick, tick)
         self.last_tick = tick
-        self.pulses.append((level, dt))
-        print(f"level={level}, dt={dt} µs")
 
-    def stop(self):
-        self.cb.cancel()
-
-    def dump_summary(self):
-        print("\n>> Tổng số xung nhận được:", len(self.pulses))
-        if len(self.pulses) < 10:
-            print("⚠️ Xung quá ít. Kiểm tra lại remote hoặc IR.")
+        if 8000 <= dt <= 10000:  # Header ~9ms
+            self.in_code = True
+            self.bits = 0
+            self.code = 0
             return
 
-        print(">> 10 xung đầu:")
-        for i in range(min(10, len(self.pulses))):
-            lvl, dt = self.pulses[i]
-            print(f"  [{i}] level={lvl}, dt={dt} µs")
+        if self.in_code:
+            if 200 <= dt <= 900:         # Bit 0
+                self.code = (self.code << 1) | 0
+                self.bits += 1
+            elif 1000 <= dt <= 2500:     # Bit 1
+                self.code = (self.code << 1) | 1
+                self.bits += 1
+            else:
+                # Xung lỗi, reset chuỗi
+                self.in_code = False
+                self.bits = 0
+                self.code = 0
+                return
 
-        # Thử phát hiện header NEC
-        for i in range(len(self.pulses)-1):
-            lvl1, dt1 = self.pulses[i]
-            lvl2, dt2 = self.pulses[i+1]
-            if 8000 <= dt1 <= 10000 and 4000 <= dt2 <= 5000:
-                print("\n✅ Phát hiện header NEC-like tại index", i)
-                break
-        else:
-            print("\n⛔ Không phát hiện header NEC.")
+            if self.bits == 32:
+                print(f">> Mã IR nhận được: 0x{self.code:08X}")
+                self.in_code = False
 
 def main():
     pi = pigpio.pi()
@@ -53,14 +51,16 @@ def main():
     pi.set_mode(IR_GPIO, pigpio.INPUT)
     pi.set_pull_up_down(IR_GPIO, pigpio.PUD_UP)
 
-    logger = IR_DebugLogger(pi, IR_GPIO)
+    print(f">> Đang lắng nghe tín hiệu IR trên GPIO {IR_GPIO}. Bấm nút trên remote...")
+    listener = IR_NEC_Listener(pi, IR_GPIO)
 
-    print(f">> Đang ghi xung IR trên GPIO {IR_GPIO}. Bấm 1 nút remote...")
-    time.sleep(5)
-
-    logger.stop()
-    logger.dump_summary()
-    pi.stop()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n>> Dừng.")
+    finally:
+        pi.stop()
 
 if __name__ == "__main__":
     main()
