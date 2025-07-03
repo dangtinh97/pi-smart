@@ -4,3 +4,4 @@ uvicorn
 #PyAudio
 GPIO
 RPi.GPIO
+pigpio
