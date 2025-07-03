@@ -37,7 +37,17 @@ def ir_callback(channel):
 
 # Lắng nghe cạnh FALLING (khi có tín hiệu IR)
 GPIO.add_event_detect(config_pinout.GPIO_IR_RECEIVER, GPIO.FALLING, callback=ir_callback, bouncetime=200)
+print("Đang lắng nghe. Nhấn Ctrl+C để dừng...")
 
+try:
+    time.sleep(9999)  # Hoặc while True nếu muốn lắng nghe mãi
+
+except KeyboardInterrupt:
+    print("\n>> Đã nhận Ctrl+C – thoát chương trình.")
+
+finally:
+    GPIO.cleanup()
+    print(">> GPIO đã được dọn dẹp xong.")
 
 # with sr.Microphone() as source:
 #     print("Bắt đầu nhận giọng nói... (Ctrl+C để dừng)")
