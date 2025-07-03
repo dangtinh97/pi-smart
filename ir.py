@@ -39,7 +39,10 @@ class IR_NEC_Listener:
                 return
 
             if self.bits == 32:
-                print(f">> Mã IR nhận được: 0x{self.code:08X}")
+                if self.code != 0xFFFFFFFF:
+                    print(f">> Mã IR nhận được: 0x{self.code:08X}")
+                else:
+                    print("[DEBUG] Bỏ qua repeat code (0xFFFFFFFF)")
                 self.in_code = False
 
 def main():
