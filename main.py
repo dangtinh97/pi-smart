@@ -3,6 +3,7 @@ from typing import Union
 from fastapi import FastAPI
 import config_pinout
 import RPi.GPIO as GPIO
+import time
 # import speech_recognition as sr
 # r = sr.Recognizer()
 app = FastAPI()
