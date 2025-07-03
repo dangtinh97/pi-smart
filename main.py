@@ -23,7 +23,7 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def setup_ir():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(config_pinout.GPIO_IR_RECEIVER, GPIO.IN)
-
+setup_ir()
 def read_ir():
     if GPIO.input(config_pinout.GPIO_IR_RECEIVER) == GPIO.LOW:
         print("IR nhận tín hiệu")
