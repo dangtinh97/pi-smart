@@ -19,7 +19,7 @@ class IR_Recorder:
         dt = pigpio.tickDiff(self.last_tick, tick)
         self.last_tick = tick
 
-        print(f"[DEBUG] dt={dt} μs")  # ← in thời gian giữa các xung
+        # print(f"[DEBUG] dt={dt} μs")  # ← in thời gian giữa các xung
 
         if 8500 <= dt <= 9500:  # Header ~9ms
             print("[DEBUG] Header detected")
