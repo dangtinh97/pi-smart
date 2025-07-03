@@ -2,7 +2,7 @@ import pigpio
 import time
 import config_pinout
 
-IR_GPIO = config_pinout.GPIO_IR_RECEIVER
+IR_GPIO = config_pinout.GPIO_IR_RECEIVER  # ví dụ: GPIO26
 
 class IR_NEC_Listener:
     def __init__(self, pi, gpio):
@@ -18,7 +18,7 @@ class IR_NEC_Listener:
         dt = pigpio.tickDiff(self.last_tick, tick)
         self.last_tick = tick
 
-        # Header NEC: khoảng 9ms
+        # Header NEC: ~9ms
         if 7000 <= dt <= 12000:
             print(f"[DEBUG] HEADER STARTED (dt = {dt} µs)")
             self.in_code = True
@@ -27,12 +27,14 @@ class IR_NEC_Listener:
             return
 
         if self.in_code:
-            if 200 <= dt <= 900:          # Bit 0
+            if 150 <= dt <= 1000:  # bit 0
                 self.code = (self.code << 1) | 0
                 self.bits += 1
-            elif 1000 <= dt <= 2500:      # Bit 1
+                print(f"[DEBUG] Bit {self.bits}: 0 (dt={dt})")
+            elif 800 <= dt <= 2800:  # bit 1
                 self.code = (self.code << 1) | 1
                 self.bits += 1
+                print(f"[DEBUG] Bit {self.bits}: 1 (dt={dt})")
             else:
                 print(f"[DEBUG] Invalid pulse: dt = {dt} µs → Reset")
                 self.in_code = False
@@ -56,14 +58,14 @@ def main():
     pi.set_mode(IR_GPIO, pigpio.INPUT)
     pi.set_pull_up_down(IR_GPIO, pigpio.PUD_UP)
 
-    print(f">> Đang lắng nghe tín hiệu IR trên GPIO {IR_GPIO}. Nhấn 1 lần nút remote...")
+    print(f">> Đang lắng nghe tín hiệu IR trên GPIO {IR_GPIO}. Nhấn 1 nút bất kỳ...")
     listener = IR_NEC_Listener(pi, IR_GPIO)
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n>> Dừng chương trình.")
+        print("\n>> Thoát.")
     finally:
         pi.stop()
 
