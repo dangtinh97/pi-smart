@@ -1,1 +1,1 @@
-GPIO_IR_RECEIVER = 17      # Pin thu IR
+GPIO_IR_RECEIVER = 25      # Pin thu IR
