@@ -1,7 +1,11 @@
 fastapi[standard]
 uvicorn
-#SpeechRecognition
-#PyAudio
-GPIO
-RPi.GPIO
-pigpio
+dotenv
+pvporcupine
+pyaudio
+numpy
+SpeechRecognition
+
+#GPIO
+#RPi.GPIO
+#pigpio
