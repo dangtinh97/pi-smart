@@ -5,7 +5,7 @@ pvporcupine
 pyaudio
 numpy
 SpeechRecognition
-
+gTTS
 #GPIO
 #RPi.GPIO
 #pigpio
