@@ -1,7 +1,8 @@
 # Pi Smart
 
 ## Install
-
+- sudo apt install mpg123
+- sudo apt install portaudio19-dev python3-pyaudio
 
 ## Run
 ```shell
