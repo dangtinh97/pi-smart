@@ -8,8 +8,10 @@ from services.play_audio import play_audio_wav
 is_listening = False
 lock = threading.Lock()
 from services.text_to_speech import  play_voice
+from service.wakeword_service import restart_wakeword_listener
 def on_wakeword_detected():
     global is_listening
+    restart_wakeword_listener(wakeword_listener)
     def play_sound():
         try:
             play_audio_wav("./data/sound.wav")
