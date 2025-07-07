@@ -13,5 +13,6 @@ def on_wakeword_detected(listener):
     global is_listening
     print("Ohh.... Wake word detected")
     play_audio_wav("./data/sound.wav")
+    time.sleep(1.5)
     listen_and_recognize()
     listener.start()
