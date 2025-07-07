@@ -1,5 +1,7 @@
 from gtts import gTTS
 import os
+
+import pyaudio
 def play_voice(mytext):
 
     # Language for the speech
@@ -17,4 +19,17 @@ def play_voice(mytext):
     os.system("/usr/bin/mpg123 ./welcome.mp3")
     os.remove("./welcome.mp3")
 
+
+
+def startMic():
+    pa = pyaudio.PyAudio()
+
+    stream = pa.open(
+        rate=16000,
+        channels=1,
+        format=pyaudio.paInt16,
+        input=True,
+        frames_per_buffer=1024,
+    )
 play_voice("Xin xin")
+start()
