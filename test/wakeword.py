@@ -54,9 +54,7 @@ class WakewordListener:
             print(f"🛑 Không thể mở stream âm thanh: {e}")
             return
 
-        self.running = True
-        self.thread = threading.Thread(target=self._run, daemon=True)
-        self.thread.start()
+        self._run()
         print("🎧 WakewordListener khởi động.")
 
     def stop(self):
