@@ -79,28 +79,55 @@ class WakewordListener:
         print("🎧 WakewordListener khởi động.")
 
     def stop(self):
+        print("🛑 Đang dừng WakewordListener...")
         self.running = False
-        if self.stream and self.stream.is_active():
-            self.stream.stop_stream()
+
+        # Dừng stream nếu còn hoạt động
         if self.stream:
-            self.stream.close()
-            self.stream = None
-        if self.thread and self.thread.is_alive() and self.thread != threading.current_thread():
-            self.thread.join()
+            try:
+                if self.stream.is_active():
+                    self.stream.stop_stream()
+                self.stream.close()
+            except Exception as e:
+                print(f"⚠️ Lỗi khi dừng/đóng stream: {e}")
+            finally:
+                self.stream = None
+
+        # Dừng thread nếu không phải thread hiện tại
+        if self.thread and self.thread.is_alive():
+            if self.thread != threading.current_thread():
+                self.thread.join()
+            else:
+                print("⚠️ Không thể join chính thread hiện tại.")
         self.thread = None
+
+        print("✅ WakewordListener đã dừng.")
 
     def _run(self):
         print("👂 Đang lắng nghe wake word...")
         try:
             while self.running:
-                pcm = self.stream.read(self.porcupine.frame_length, exception_on_overflow=False)
-                pcm_unpacked = struct.unpack_from("h" * self.porcupine.frame_length, pcm)
-                result = self.porcupine.process(pcm_unpacked)
-                if result >= 0:
-                    print("🔔 Wakeword phát hiện!")
-                    event_bus.emit("wakeword.detected")
+                if self.stream is None:
+                    print("⚠️ Stream không tồn tại. Thoát listener.")
+                    break
+                try:
+                    pcm = self.stream.read(self.porcupine.frame_length, exception_on_overflow=False)
+                    pcm_unpacked = struct.unpack_from("h" * self.porcupine.frame_length, pcm)
+                    result = self.porcupine.process(pcm_unpacked)
+                    if result >= 0:
+                        print("🔔 Wakeword phát hiện!")
+                        event_bus.emit("wakeword.detected")
+                except IOError as e:
+                    print(f"⚠️ IOError khi đọc stream: {e}")
+                    break
+                except Exception as e:
+                    print(f"⚠️ Lỗi không xác định khi đọc stream: {e}")
+                    break
         except Exception as e:
-            print(f"🔥 Lỗi trong wakeword_listener: {e}")
+            print(f"🔥 Lỗi lớn trong _run: {e}")
+        finally:
+            self.stop()
+            print("🧹 Đã dọn dẹp sau khi lắng nghe xong.")
 
     def terminate(self):
         self.stop()
