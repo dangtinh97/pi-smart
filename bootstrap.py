@@ -5,5 +5,5 @@ from handlers.wakeword_handler import on_wakeword_detected
 
 def start_system():
     print("🚀 Khởi động hệ thống")
-    threading.Thread(target=wakeword_listener.start, daemon=True).start()
-    event_bus.on("wakeword.detected", on_wakeword_detected)
+    # threading.Thread(target=wakeword_listener.start, daemon=True).start()
+    # event_bus.on("wakeword.detected", on_wakeword_detected)
