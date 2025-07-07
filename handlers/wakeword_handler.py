@@ -23,9 +23,9 @@ def on_wakeword_detected():
 
         try:
             print("🛑 Stopping wakeword listener...")
-            #wakeword_listener.stop()
-            #time.sleep(0.2)
-            #print("🎙️ Bắt đầu ghi âm từ mic...")
+            wakeword_listener.stop()
+            time.sleep(0.2)
+            print("🎙️ Bắt đầu ghi âm từ mic...")
             #speech_recognizer.listen_and_recognize()
         except Exception as e:
             print(f"🔥 Lỗi trong xử lý wakeword: {e}")
