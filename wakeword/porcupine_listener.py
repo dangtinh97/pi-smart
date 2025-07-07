@@ -125,9 +125,9 @@ class WakewordListener:
                     break
         except Exception as e:
             print(f"🔥 Lỗi lớn trong _run: {e}")
-        finally:
-            self.stop()
-            print("🧹 Đã dọn dẹp sau khi lắng nghe xong.")
+        # finally:
+            # self.stop()
+            # print("🧹 Đã dọn dẹp sau khi lắng nghe xong.")
 
     def terminate(self):
         self.stop()

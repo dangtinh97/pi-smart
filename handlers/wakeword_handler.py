@@ -11,8 +11,9 @@ lock = threading.Lock()
 
 def on_wakeword_detected(listener):
     global is_listening
+    listener.stop()
     print("Ohh.... Wake word detected")
     play_audio_wav("./data/sound.wav")
-    # time.sleep(5)
-    # listen_and_recognize()
+
+    listen_and_recognize()
     # listener.start()
