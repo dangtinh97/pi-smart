@@ -25,7 +25,7 @@ class WakewordListener:
             max_input = info['maxInputChannels']
             max_output = info['maxOutputChannels']
             print(f"[{i}] {name} | Input: {max_input} | Output: {max_output}")
-            if 'usb' in name.lower() and info['maxInputChannels'] > 0:
+            if 'usb' in name.lower() and max_input > 0:
                 print(f"🎤 Tìm thấy mic USB tại index {i}: {info['name']}")
                 self.indexAudio = i
     def start(self):
