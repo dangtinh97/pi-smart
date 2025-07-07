@@ -79,10 +79,8 @@ class WakewordListener:
         print("🎧 WakewordListener khởi động.")
 
     def stop(self):
-        print("🛑 Đang dừng WakewordListener...")
         self.running = False
 
-        # Dừng stream nếu còn hoạt động
         if self.stream:
             try:
                 if self.stream.is_active():
@@ -93,9 +91,9 @@ class WakewordListener:
             finally:
                 self.stream = None
 
-        # Dừng thread nếu không phải thread hiện tại
+        current_thread = threading.current_thread()
         if self.thread and self.thread.is_alive():
-            if self.thread != threading.current_thread():
+            if self.thread != current_thread:
                 self.thread.join()
             else:
                 print("⚠️ Không thể join chính thread hiện tại.")
