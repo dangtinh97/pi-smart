@@ -4,7 +4,7 @@ from services import speech_recognizer
 from services.play_audio import play_audio_wav
 from services.text_to_speech import play_voice
 from services.wakeword_listener import restart_wakeword_listener
-from services.text_to_speech import listen_and_recognize
+from services.speech_recognizer import listen_and_recognize
 # Trạng thái ngăn chặn lắng nghe song song
 is_listening = False
 lock = threading.Lock()
