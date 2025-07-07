@@ -17,3 +17,5 @@ def play_voice(mytext):
     # os.system("mpg321 welcome.mp3") # For Linux
     os.system(PATH_MPG123+" ./welcome.mp3")
     os.remove("./welcome.mp3")
+
+play_voice("Xin xin")
