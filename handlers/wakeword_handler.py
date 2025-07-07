@@ -37,6 +37,6 @@ def on_wakeword_detected(listener):
             print("▶️ Khởi động lại WakewordListener...")
             time.sleep(0.5)  # Chờ cho chắc ALSA ổn định
             listener.start()
-            is_listening = False
+            self.is_listening = False
 
-    threading.Thread(target=handle, daemon=True).start()
+        threading.Thread(target=handle, daemon=True).start()
