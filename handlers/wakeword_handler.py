@@ -23,7 +23,7 @@ def on_wakeword_detected(listener):
         try:
             print("🛑 Dừng WakewordListener để tránh xung đột mic...")
             listener.stop()
-            time.sleep(0.5)
+            time.sleep(1.0)
 
             print("🔔 Wake word detected!")
             play_audio_wav("./data/sound.wav")
