@@ -1,9 +1,9 @@
-import threading
-import time
-import pyaudio
-
-
 def restart_wakeword_listener(listener):
+    import threading
+    import time
+    import pyaudio
+    import os
+
     def restart():
         print("🛑 Dừng wakeword listener...")
         listener.running = False
@@ -14,7 +14,10 @@ def restart_wakeword_listener(listener):
             listener.stream.close()
             listener.stream = None
         listener.pa.terminate()
-        time.sleep(2)  # Chờ ALSA giải phóng
+
+        print("🔄 Reset ALSA...")
+        os.system("sudo alsa force-reload")
+        time.sleep(4)  # Tăng thời gian chờ để ALSA ổn định
 
         print("▶️ Khởi động lại wakeword listener...")
         listener.pa = pyaudio.PyAudio()
