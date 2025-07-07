@@ -49,7 +49,6 @@ class WakewordListener:
                 format=pyaudio.paInt16,
                 input=True,
                 frames_per_buffer=self.porcupine.frame_length,
-
             )
         except Exception as e:
             print(f"🛑 Không thể mở stream âm thanh: {e}")
