@@ -25,16 +25,17 @@ def on_wakeword_detected():
         is_listening = True
 
     def handle():
-        restart_wakeword_listener(wakeword_listener)
+
         global is_listening
         is_listening = True
 
         try:
+            restart_wakeword_listener(wakeword_listener)
             print("🛑 Stopping wakeword listener...")
             # wakeword_listener.stop()
-            # time.sleep(0.5)
+            time.sleep(1)
             # print("🎙️ Bắt đầu ghi âm từ mic...")
-            #speech_recognizer.listen_and_recognize()
+            speech_recognizer.listen_and_recognize()
         except Exception as e:
             print(f"🔥 Lỗi trong xử lý wakeword: {e}")
         finally:
