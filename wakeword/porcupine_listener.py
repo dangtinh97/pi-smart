@@ -38,9 +38,28 @@ class WakewordListener:
         if self.running:
             print("⚠️ WakewordListener đã chạy rồi, không khởi động lại.")
             return
+
         if self.indexAudio is None:
             print("🛑 Không có thiết bị input phù hợp. Hủy khởi động WakewordListener.")
             return
+
+        # Đảm bảo không có stream cũ còn mở
+        if self.stream:
+            try:
+                if self.stream.is_active():
+                    self.stream.stop_stream()
+                self.stream.close()
+            except Exception as e:
+                print(f"⚠️ Lỗi khi đóng stream cũ: {e}")
+            self.stream = None
+
+        # Re-initialize PyAudio để tránh xung đột sau khi stop
+        try:
+            self.pa.terminate()
+        except:
+            pass
+        self.pa = pyaudio.PyAudio()
+
         try:
             self.stream = self.pa.open(
                 input_device_index=self.indexAudio,
