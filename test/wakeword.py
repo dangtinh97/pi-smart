@@ -3,7 +3,6 @@ import pvporcupine
 import pyaudio
 import struct
 import threading
-from core.event_bus import event_bus
 ACCESS_KEY="I2FzB0ROEKTLiBLnLa8jByF9b7wu+o6h4Z9PvWFKRwTpmZ9gmBpeaw=="
 KEYWORD_PATH=data/hotwords/raspberry.ppn
 
