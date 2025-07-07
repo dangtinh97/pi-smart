@@ -8,9 +8,7 @@ is_listening = False
 from services.text_to_speech import  play_voice
 def on_wakeword_detected():
     global is_listening
-    os.system(PATH_MPG123+" -o alsa -a hw:1,0 ./data/sound.mp3")
-    time.sleep(1)
-    os.system("sudo alsactl init")
+    #os.system(PATH_MPG123+" -o alsa -a hw:1,0 ./data/sound.mp3")
     if is_listening:
         print("⚠️ Đã trong quá trình nhận lệnh, bỏ qua wakeword")
         return
