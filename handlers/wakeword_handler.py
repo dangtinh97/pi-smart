@@ -6,11 +6,9 @@ import os
 from config import PATH_MPG123
 is_listening = False
 from services.text_to_speech import  play_voice
-from services.play_audio import play_audio_mp3
 def on_wakeword_detected():
     global is_listening
-    play_audio_mp3("./data/sound.mp3")
-    #os.system(PATH_MPG123+" -o alsa -a hw:1,0 ./data/sound.mp3")
+    # os.system(PATH_MPG123+" -o alsa -a hw:1,0 ./data/sound.mp3")
     if is_listening:
         print("⚠️ Đã trong quá trình nhận lệnh, bỏ qua wakeword")
         return
