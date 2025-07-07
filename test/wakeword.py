@@ -1,5 +1,8 @@
 import pyaudio
+import sys
 
+# Redirect ALSA warnings
+sys.stderr = open(os.devnull, 'w')
 pa = pyaudio.PyAudio()
 
 stream = pa.open(
