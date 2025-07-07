@@ -8,14 +8,17 @@ is_listening = False
 from services.text_to_speech import  play_voice
 def on_wakeword_detected():
     global is_listening
-    #
-    try:
-        os.system(PATH_MPG123 + " -o alsa -a hw:1,0 ./data/sound.mp3")
-    except Exception as e:
-        print(f"Error play sound.mp3: {e}")
-    if is_listening:
-        print("⚠️ Đã trong quá trình nhận lệnh, bỏ qua wakeword")
-        return
+    def play_sound():
+        try:
+            os.system(f"{PATH_MPG123} -o alsa -a hw:1,0 ./data/sound.mp3")
+        except Exception as e:
+            print(f"Error play sound.mp3: {e}")
+
+    with lock:
+        if is_listening:
+            print("⚠️ Đã trong quá trình nhận lệnh, bỏ qua wakeword")
+            return
+        is_listening = True
 
     def handle():
         global is_listening
@@ -34,4 +37,4 @@ def on_wakeword_detected():
             #wakeword_listener.start()
             #is_listening = False
 
-    threading.Thread(target=handle, daemon=True).start()
+    threading.Thread(target=lambda: (play_sound(), handle()), daemon=True).start()
