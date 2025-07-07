@@ -108,6 +108,8 @@ class WakewordListener:
                         logger.info("🔔 Wakeword phát hiện!")
                         self.play_audio(audio_file="data/sound.mp3")
                         self.running = False
+                        self.stop()
+                        time.sleep(1)
                         self.start()
                         # event_bus.emit("wakeword.detected")  # Bỏ comment nếu cần
                 except Exception as e:
