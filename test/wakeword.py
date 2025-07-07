@@ -4,7 +4,7 @@ import pyaudio
 import struct
 import threading
 ACCESS_KEY="I2FzB0ROEKTLiBLnLa8jByF9b7wu+o6h4Z9PvWFKRwTpmZ9gmBpeaw=="
-KEYWORD_PATH=data/hotwords/raspberry.ppn
+KEYWORD_PATH="data/hotwords/raspberry.ppn"
 
 class WakewordListener:
     def __init__(self):
