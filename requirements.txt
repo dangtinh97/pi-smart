@@ -6,6 +6,6 @@ pyaudio
 numpy
 SpeechRecognition
 gTTS
-#GPIO
-#RPi.GPIO
-#pigpio
+GPIO
+RPi.GPIO
+pigpio
