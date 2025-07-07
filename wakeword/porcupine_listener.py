@@ -14,12 +14,20 @@ class WakewordListener:
             access_key=ACCESS_KEY,
             keyword_paths=[KEYWORD_PATH]
         )
-
+        self.indexAudio = 0
         self.pa = pyaudio.PyAudio()
         self.stream = None
         self.running = False
         self.thread = None
-
+        for i in range(self.pa.get_device_count()):
+            info = self.pa.get_device_info_by_index(i)
+            name = info['name']
+            max_input = info['maxInputChannels']
+            max_output = info['maxOutputChannels']
+            print(f"[{i}] {name} | Input: {max_input} | Output: {max_output}")
+            if 'usb' in name and info['maxInputChannels'] > 0:
+                print(f"🎤 Tìm thấy mic USB tại index {i}: {info['name']}")
+                self.indexAudio = i
     def start(self):
         if self.running:
             print("⚠️ WakewordListener đã chạy rồi, không khởi động lại.")
@@ -31,7 +39,8 @@ class WakewordListener:
             channels=1,
             format=pyaudio.paInt16,
             input=True,
-            frames_per_buffer=self.porcupine.frame_length
+            frames_per_buffer=self.porcupine.frame_length,
+            input_device_index=self.indexAudio
         )
 
         self.running = True
