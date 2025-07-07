@@ -66,7 +66,7 @@ class WakewordListener:
         if self.stream:
             self.stream.close()
             self.stream = None
-        if self.thread and self.thread != threading.current_thread():
+        if self.thread and self.thread.is_alive() and self.thread != threading.current_thread():
             self.thread.join()
         self.thread = None
 
