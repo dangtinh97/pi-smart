@@ -1,9 +1,8 @@
-# services/wakeword_listener.py
-
 import pvporcupine
 import pyaudio
 import struct
 import threading
+import time
 from core.event_bus import event_bus
 from config import ACCESS_KEY, KEYWORD_PATH
 
@@ -13,100 +12,87 @@ class WakewordListener:
             access_key=ACCESS_KEY,
             keyword_paths=[KEYWORD_PATH]
         )
-        self.pa = pyaudio.PyAudio()
+        self.pa = None
         self.indexAudio = None
         self.stream = None
         self.running = False
         self.thread = None
 
+        self._detect_input_device()
+
+    def _detect_input_device(self):
         print("🔍 Đang dò thiết bị âm thanh...")
-        for i in range(self.pa.get_device_count()):
-            info = self.pa.get_device_info_by_index(i)
+        pa = pyaudio.PyAudio()
+        for i in range(pa.get_device_count()):
+            info = pa.get_device_info_by_index(i)
             name = info['name']
             max_input = info['maxInputChannels']
-            max_output = info['maxOutputChannels']
-            print(f"[{i}] {name} | Input: {max_input} | Output: {max_output}")
             if 'usb' in name.lower() and max_input > 0:
                 print(f"🎤 Tìm thấy mic USB tại index {i}: {name}")
                 self.indexAudio = i
                 break
-
+        pa.terminate()
         if self.indexAudio is None:
             print("❌ Không tìm thấy mic USB. WakewordListener sẽ không hoạt động.")
 
     def start(self):
         if self.running:
-            print("⚠️ WakewordListener đã chạy rồi, không khởi động lại.")
+            print("⚠️ WakewordListener đã chạy rồi.")
             return
-
         if self.indexAudio is None:
-            print("🛑 Không có thiết bị input phù hợp. Hủy khởi động WakewordListener.")
+            print("🛑 Không có thiết bị input phù hợp.")
             return
 
-        # Đảm bảo không có stream cũ còn mở
-        if self.stream:
-            try:
-                if self.stream.is_active():
-                    self.stream.stop_stream()
-                self.stream.close()
-            except Exception as e:
-                print(f"⚠️ Lỗi khi đóng stream cũ: {e}")
-            self.stream = None
-
-        # Re-initialize PyAudio để tránh xung đột sau khi stop
         try:
-            self.pa.terminate()
-        except:
-            pass
-        self.pa = pyaudio.PyAudio()
-
-        try:
+            if self.pa:
+                self.pa.terminate()
+                time.sleep(0.3)
+            self.pa = pyaudio.PyAudio()
             self.stream = self.pa.open(
                 input_device_index=self.indexAudio,
                 rate=self.porcupine.sample_rate,
                 channels=1,
                 format=pyaudio.paInt16,
                 input=True,
-                frames_per_buffer=self.porcupine.frame_length,
+                frames_per_buffer=self.porcupine.frame_length
             )
+            self.running = True
+            self.thread = threading.Thread(target=self._run, daemon=True)
+            self.thread.start()
+            print("🎧 WakewordListener khởi động.")
         except Exception as e:
-            print(f"🛑 Không thể mở stream âm thanh: {e}")
-            return
-
-        self.running = True
-        self.thread = threading.Thread(target=self._run, daemon=True)
-        self.thread.start()
-        print("🎧 WakewordListener khởi động.")
+            print(f"🛑 Không mở được stream: {e}")
+            self.running = False
+            if self.pa:
+                self.pa.terminate()
+            self.pa = None
 
     def stop(self):
+        print("🛑 Đang dừng WakewordListener...")
         self.running = False
-
-        if self.stream:
-            try:
+        try:
+            if self.stream:
                 if self.stream.is_active():
                     self.stream.stop_stream()
                 self.stream.close()
-            except Exception as e:
-                print(f"⚠️ Lỗi khi dừng/đóng stream: {e}")
-            finally:
-                self.stream = None
+        except Exception as e:
+            print(f"⚠️ Lỗi khi dừng/đóng stream: {e}")
+        self.stream = None
 
-        current_thread = threading.current_thread()
-        if self.thread and self.thread.is_alive():
-            if self.thread != current_thread:
-                self.thread.join()
-            else:
+        if self.thread and self.thread.is_alive() and self.thread != threading.current_thread():
+            try:
+                self.thread.join(timeout=1)
+            except RuntimeError:
                 print("⚠️ Không thể join chính thread hiện tại.")
         self.thread = None
-
         print("✅ WakewordListener đã dừng.")
 
     def _run(self):
         print("👂 Đang lắng nghe wake word...")
         try:
             while self.running:
-                if self.stream is None:
-                    print("⚠️ Stream không tồn tại. Thoát listener.")
+                if not self.stream:
+                    print("⚠️ Stream không tồn tại. Thoát.")
                     break
                 try:
                     pcm = self.stream.read(self.porcupine.frame_length, exception_on_overflow=False)
@@ -123,14 +109,17 @@ class WakewordListener:
                     break
         except Exception as e:
             print(f"🔥 Lỗi lớn trong _run: {e}")
-        # finally:
-            # self.stop()
-            # print("🧹 Đã dọn dẹp sau khi lắng nghe xong.")
+        finally:
+            self.stop()
+            print("🧹 Đã dọn dẹp sau khi lắng nghe xong.")
 
     def terminate(self):
         self.stop()
-        self.pa.terminate()
+        if self.pa:
+            try:
+                self.pa.terminate()
+            except Exception as e:
+                print(f"⚠️ Lỗi khi terminate PyAudio: {e}")
+        self.pa = None
         self.porcupine.delete()
-
-# Global instance
-wakeword_listener = WakewordListener()
+        print("🗑️ WakewordListener đã được hủy.")
