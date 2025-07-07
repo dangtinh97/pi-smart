@@ -19,10 +19,11 @@ def on_wakeword_detected(listener):
     is_listening = True
 
     def handle():
+        global is_listening  # cần khai báo lại nếu gán
         try:
             print("🛑 Dừng WakewordListener để tránh xung đột mic...")
             listener.stop()
-            time.sleep(0.5)  # Đợi giải phóng hoàn toàn thiết bị
+            time.sleep(0.5)
 
             print("🔔 Wake word detected!")
             play_audio_wav("./data/sound.wav")
@@ -35,8 +36,9 @@ def on_wakeword_detected(listener):
 
         finally:
             print("▶️ Khởi động lại WakewordListener...")
-            time.sleep(0.5)  # Chờ cho chắc ALSA ổn định
+            time.sleep(0.5)
             listener.start()
-            self.is_listening = False
+            is_listening = False
 
-        threading.Thread(target=handle, daemon=True).start()
+    # ✅ Thread được tạo đúng chỗ
+    threading.Thread(target=handle, daemon=True).start()
