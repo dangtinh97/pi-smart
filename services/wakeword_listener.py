@@ -1,23 +1,9 @@
-import sounddevice as sd
-import pvporcupine
+import threading
+import time
+import pyaudio
 
-porcupine = ...
-stream = None
 
-def start():
-    global stream
-    stream = sd.InputStream(...)  # hoặc mở lại porcupine
-    stream.start()
-
-def stop():
-    if stream:
-        stream.stop()
-        stream.close()
 def restart_wakeword_listener(listener):
-    import threading
-    import time
-    import pyaudio
-
     def restart():
         print("🛑 Dừng wakeword listener...")
         listener.running = False
