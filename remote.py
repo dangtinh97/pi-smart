@@ -60,7 +60,7 @@ if not pi.connected:
 pi.set_PWM_frequency(GPIO_IR, CARRIER_FREQ)
 pi.set_PWM_dutycycle(GPIO_IR, 128)  # dùng khi cần test PWM
 
-code = 0x20DF10EF  # NEC mã POWER
+code = 0xF9FE4FCF  # NEC mã POWER
 waveform = nec_encode(code)
 send_code(pi, GPIO_IR, waveform)
 
