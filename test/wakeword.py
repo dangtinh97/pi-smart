@@ -43,7 +43,7 @@ class WakewordListener:
     def play_audio(self, audio_file="data/sound_converted.wav"):
         """Phát âm thanh và đặt lại ALSA sau khi hoàn tất."""
         logger.info("🔊 Phát âm thanh...")
-        os.system("mpg123 -o alsa -a dmix %s" % audio_file)
+        os.system("mpg123 -o alsa -a hw:1,0 %s" % audio_file)
         time.sleep(1)  # Chờ giải phóng tài nguyên
         os.system("sudo alsactl init")
         time.sleep(0.5)
