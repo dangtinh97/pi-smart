@@ -8,7 +8,7 @@ import speech_recognition as sr
 
 ACCESS_KEY = "I2FzB0ROEKTLiBLnLa8jByF9b7wu+o6h4Z9PvWFKRwTpmZ9gmBpeaw=="
 KEYWORD_PATH = "data/hotwords/raspberry.ppn"
-AUDIO_PLAY_PATH = "data/sound.wav"  # file WAV, không mp3
+AUDIO_PLAY_PATH = "data/sound.wav"  # file WAV, không dùng mp3
 
 class WakewordListener:
     def __init__(self):
@@ -52,15 +52,18 @@ class WakewordListener:
         print("🎧 WakewordListener khởi động.")
 
     def stop(self):
-        if not self.running:
-            return
         self.running = False
         if self.thread and self.thread.is_alive():
-            self.thread.join()
+            import threading as th
+            if th.current_thread() != self.thread:
+                self.thread.join()
+            else:
+                print("⚠️ Đang gọi stop từ chính thread, không join để tránh lỗi")
         if self.stream:
             self.stream.stop_stream()
             self.stream.close()
             self.stream = None
+        self.thread = None
         print("🛑 WakewordListener đã dừng.")
 
     def _run(self):
@@ -78,7 +81,7 @@ class WakewordListener:
             self.stop()
 
     def on_wakeword(self):
-        # Ghi đè để xử lý khi phát hiện wakeword
+        # Ghi đè xử lý khi phát hiện wakeword
         pass
 
     def terminate(self):
@@ -113,12 +116,13 @@ def recognize_speech():
 if __name__ == "__main__":
     wakeword_listener = WakewordListener()
 
-    # Override callback xử lý wakeword
     def on_wakeword_detected():
-        wakeword_listener.stop()
-        play_sound(AUDIO_PLAY_PATH)
-        recognize_speech()
-        wakeword_listener.start()
+        def handler():
+            wakeword_listener.stop()
+            play_sound(AUDIO_PLAY_PATH)
+            recognize_speech()
+            wakeword_listener.start()
+        threading.Thread(target=handler).start()
 
     wakeword_listener.on_wakeword = on_wakeword_detected
 
