@@ -10,4 +10,4 @@ GPIO
 RPi.GPIO
 pigpio
 requests
-pygame
+simpleaudio
