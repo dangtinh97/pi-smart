@@ -13,6 +13,24 @@ logger = logging.getLogger(__name__)
 ACCESS_KEY = "I2FzB0ROEKTLiBLnLa8jByF9b7wu+o6h4Z9PvWFKRwTpmZ9gmBpeaw=="
 KEYWORD_PATH = "data/hotwords/raspberry.ppn"
 
+def is_audio_device_ready(index, rate, frame_length):
+    try:
+        pa = pyaudio.PyAudio()
+        stream = pa.open(
+            input_device_index=index,
+            rate=rate,
+            channels=1,
+            format=pyaudio.paInt16,
+            input=True,
+            frames_per_buffer=frame_length
+        )
+        stream.close()
+        pa.terminate()
+        return True
+    except Exception as e:
+        logger.warning(f"⏳ Thiết bị chưa sẵn sàng: {e}")
+        return False
+
 class WakewordListener:
     def __init__(self):
         self.porcupine = pvporcupine.create(
@@ -57,11 +75,9 @@ class WakewordListener:
             logger.error("🛑 Không có thiết bị input phù hợp. Hủy khởi động WakewordListener.")
             return
 
-        # Đặt lại ALSA trước khi mở luồng
         os.system("sudo alsactl init")
         time.sleep(0.5)
 
-        # Khởi tạo lại PyAudio để đảm bảo trạng thái sạch
         self.pa = pyaudio.PyAudio()
         logger.info(f"🔍 Device index: {self.indexAudio}, Sample rate: {self.porcupine.sample_rate}, Frame length: {self.porcupine.frame_length}")
         try:
@@ -71,7 +87,7 @@ class WakewordListener:
                 channels=1,
                 format=pyaudio.paInt16,
                 input=True,
-                frames_per_buffer=1024,  # Tăng để tránh xrun
+                frames_per_buffer=1024
             )
             logger.info("🎧 Stream opened successfully")
         except Exception as e:
@@ -107,11 +123,17 @@ class WakewordListener:
                     if result >= 0:
                         logger.info("🔔 Wakeword phát hiện!")
                         self.play_audio(audio_file="data/sound.mp3")
+
                         self.running = False
                         self.stop()
-                        time.sleep(1)
+
+                        logger.info("⏳ Đợi thiết bị âm thanh sẵn sàng trước khi restart...")
+                        for _ in range(10):  # Chờ tối đa 5 giây
+                            if is_audio_device_ready(self.indexAudio, self.porcupine.sample_rate, self.porcupine.frame_length):
+                                break
+                            time.sleep(0.5)
+
                         self.start()
-                        # event_bus.emit("wakeword.detected")  # Bỏ comment nếu cần
                 except Exception as e:
                     logger.error(f"🔥 Lỗi khi đọc stream: {e}")
                     break
@@ -124,6 +146,11 @@ class WakewordListener:
         """Phát âm thanh và khởi động lại listener."""
         self.stop()
         self.play_audio(audio_file)
+        logger.info("⏳ Đợi thiết bị âm thanh sẵn sàng trước khi restart...")
+        for _ in range(10):
+            if is_audio_device_ready(self.indexAudio, self.porcupine.sample_rate, self.porcupine.frame_length):
+                break
+            time.sleep(0.5)
         self.start()
 
     def terminate(self):
