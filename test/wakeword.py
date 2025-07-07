@@ -5,11 +5,11 @@ porcupine = pvporcupine.create(
             keyword_paths=["data/hotwords/raspberry.ppn"]
         )
 pa = pyaudio.PyAudio()
-stream = pa.open(
-    rate=porcupine.sample_rate,
-    channels=1,
-    format=pyaudio.paInt16,
-    input=True,
-    frames_per_buffer=porcupine.frame_length,
-    input_device_index=1
-)
+# stream = pa.open(
+#     rate=porcupine.sample_rate,
+#     channels=1,
+#     format=pyaudio.paInt16,
+#     input=True,
+#     frames_per_buffer=porcupine.frame_length,
+#     input_device_index=1
+# )
