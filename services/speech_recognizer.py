@@ -1,11 +1,13 @@
 # services/speech_recognizer.py
 
 import speech_recognition as sr
+import asyncio
+import threading
 #from core.event_bus import event_bus
 
 recognizer = sr.Recognizer()
 mic = sr.Microphone()
-
+from services.ai_agent import aiAgent
 def listen_and_recognize():
     import speech_recognition as sr
 
@@ -24,6 +26,12 @@ def listen_and_recognize():
     try:
         text = recognizer.recognize_google(audio, language="vi-VN")
         print("📝 Văn bản:", text)
+
+        # ✅ Gọi bất đồng bộ mà không chờ
+        def run_async():
+            asyncio.run(aiAgent.question(text))
+
+        threading.Thread(target=run_async).start()
     except sr.UnknownValueError:
         print("🤷‍♂️ Không nhận diện được nội dung")
     except sr.RequestError as e:

@@ -15,3 +15,4 @@ def get(key, default=None, cast=str):
 
 ACCESS_KEY     = get("ACCESS_KEY", "default-key")
 KEYWORD_PATH   = get("KEYWORD_PATH", "data/hotwords/hey_pi_raspberry-pi.ppn")
+GEMINI_API_KEY = get("GEMINI_API_KEY", "default-key")
