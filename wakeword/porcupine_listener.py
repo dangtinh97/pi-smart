@@ -68,8 +68,12 @@ class WakewordListener:
             self.pa = None
 
     def stop(self):
+        if not self.running:
+            print("⚠️ WakewordListener đã dừng rồi.")
+            return
         print("🛑 Đang dừng WakewordListener...")
         self.running = False
+
         try:
             if self.stream:
                 if self.stream.is_active():
@@ -86,7 +90,6 @@ class WakewordListener:
                 print("⚠️ Không thể join chính thread hiện tại.")
         self.thread = None
         print("✅ WakewordListener đã dừng.")
-
     def _run(self):
         print("👂 Đang lắng nghe wake word...")
         try:
