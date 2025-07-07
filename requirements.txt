@@ -9,3 +9,4 @@ gTTS
 GPIO
 RPi.GPIO
 pigpio
+py-ir-remote
