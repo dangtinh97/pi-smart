@@ -15,4 +15,4 @@ def on_wakeword_detected(listener):
     play_audio_wav("./data/sound.wav")
     time.sleep(1.5)
     listen_and_recognize()
-    listener.start()
+    # listener.start()
