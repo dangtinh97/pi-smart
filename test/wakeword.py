@@ -32,6 +32,7 @@ class WakewordListener:
 
         if self.indexAudio is None:
             print("❌ Không tìm thấy mic USB. WakewordListener sẽ không hoạt động.")
+        self.start()
 
     def start(self):
         if self.running:
