@@ -5,6 +5,7 @@ from wakeword.porcupine_listener import wakeword_listener
 import os
 from config import PATH_MPG123
 is_listening = False
+lock = threading.Lock()
 from services.text_to_speech import  play_voice
 def on_wakeword_detected():
     global is_listening
