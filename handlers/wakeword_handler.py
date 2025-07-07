@@ -11,7 +11,6 @@ from services.text_to_speech import  play_voice
 from services.wakeword_listener import restart_wakeword_listener
 def on_wakeword_detected():
     global is_listening
-    restart_wakeword_listener(wakeword_listener)
     def play_sound():
         try:
             play_audio_wav("./data/sound.wav")
@@ -26,20 +25,21 @@ def on_wakeword_detected():
         is_listening = True
 
     def handle():
+        restart_wakeword_listener(wakeword_listener)
         global is_listening
         is_listening = True
 
         try:
             print("🛑 Stopping wakeword listener...")
-            wakeword_listener.stop()
-            time.sleep(0.5)
-            print("🎙️ Bắt đầu ghi âm từ mic...")
+            # wakeword_listener.stop()
+            # time.sleep(0.5)
+            # print("🎙️ Bắt đầu ghi âm từ mic...")
             #speech_recognizer.listen_and_recognize()
         except Exception as e:
             print(f"🔥 Lỗi trong xử lý wakeword: {e}")
         finally:
             print("▶️ Bật lại wakeword listener")
-            #wakeword_listener.start()
-            #is_listening = False
+            wakeword_listener.start()
+            is_listening = False
 
     threading.Thread(target=lambda: (play_sound(), handle()), daemon=True).start()
