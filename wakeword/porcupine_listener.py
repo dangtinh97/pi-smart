@@ -79,7 +79,7 @@ class WakewordListener:
                 result = self.porcupine.process(pcm_unpacked)
                 if result >= 0:
                     print("🔔 Wakeword phát hiện!")
-                    event_bus.emit("wakeword.detected")
+                    # event_bus.emit("wakeword.detected")
         except Exception as e:
             print(f"🔥 Lỗi trong wakeword_listener: {e}")
 
