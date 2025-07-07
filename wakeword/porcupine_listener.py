@@ -41,15 +41,15 @@ class WakewordListener:
         if self.indexAudio is None:
             print("🛑 Không có thiết bị input phù hợp. Hủy khởi động WakewordListener.")
             return
-
         try:
             self.stream = self.pa.open(
+                input_device_index=self.indexAudio,
                 rate=self.porcupine.sample_rate,
                 channels=1,
                 format=pyaudio.paInt16,
                 input=True,
                 frames_per_buffer=self.porcupine.frame_length,
-                input_device_index=self.indexAudio
+
             )
         except Exception as e:
             print(f"🛑 Không thể mở stream âm thanh: {e}")
