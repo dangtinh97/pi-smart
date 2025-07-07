@@ -32,4 +32,4 @@ def startMic():
         frames_per_buffer=1024,
     )
 play_voice("Xin xin")
-start()
+startMic()
