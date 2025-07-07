@@ -2,7 +2,6 @@ from gtts import gTTS
 import os
 from config import PATH_MPG123
 def play_voice(mytext):
-    return
     # Language for the speech
     language = 'vi'
 
