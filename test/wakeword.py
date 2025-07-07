@@ -106,6 +106,8 @@ class WakewordListener:
                     result = self.porcupine.process(pcm_unpacked)
                     if result >= 0:
                         logger.info("🔔 Wakeword phát hiện!")
+                        self.play_audio(audio_file="data/sound.mp3")
+                        self.start()
                         # event_bus.emit("wakeword.detected")  # Bỏ comment nếu cần
                 except Exception as e:
                     logger.error(f"🔥 Lỗi khi đọc stream: {e}")
