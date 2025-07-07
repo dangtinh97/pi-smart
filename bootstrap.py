@@ -7,4 +7,4 @@ def start_system():
     print("🚀 Khởi động hệ thống")
     wakeword_listener.start()
     # threading.Thread(target=wakeword_listener.start, daemon=True).start()
-    event_bus.on("wakeword.detected", on_wakeword_detected)
+    event_bus.on("wakeword.detected", lambda: on_wakeword_detected(wakeword_listener))

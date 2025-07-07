@@ -10,31 +10,6 @@ from services.wakeword_listener import restart_wakeword_listener
 is_listening = False
 lock = threading.Lock()
 
-def on_wakeword_detected():
+def on_wakeword_detected(listener):
     global is_listening
-
-    def handle_wakeword():
-        global is_listening
-
-        with lock:
-            if is_listening:
-                print("⚠️ Đã trong quá trình nhận lệnh, bỏ qua wakeword")
-                return
-            is_listening = True
-
-        try:
-            print("🔁 Restart WakewordListener để giải phóng thiết bị ghi âm")
-            restart_wakeword_listener(wakeword_listener)
-
-            print("🔊 Phát âm thanh phản hồi")
-            play_audio_wav("./data/sound.wav")
-
-            print("🎙️ Bắt đầu nhận giọng nói...")
-            speech_recognizer.listen_and_recognize()
-        except Exception as e:
-            print(f"🔥 Lỗi khi xử lý wakeword: {e}")
-        finally:
-            is_listening = False
-            print("✅ Hoàn tất xử lý wakeword")
-
-    threading.Thread(target=handle_wakeword, daemon=True).start()
+    print("Ohh.... Wake word detected")
