@@ -1,24 +1,18 @@
 import pigpio
 import time
-from ir_remote import NECDecoder
-import config_pinout  # Đảm bảo có GPIO_IR_RECEIVER = 26 hoặc GPIO bạn dùng
+import config_pinout
 
 IR_GPIO = config_pinout.GPIO_IR_RECEIVER
 
-class IRCombinedDecoder:
+class NECDecoderPure:
     def __init__(self, pi, gpio):
         self.pi = pi
         self.gpio = gpio
         self.last_tick = 0
+        self.last_level = 1
         self.pulses = []
         self.in_frame = False
-        self.last_level = 1
-        self.frame_timeout = 0.1
-        self.decoder = NECDecoder()
-
-        self.bits = 0
-        self.code = 0
-        self.in_code = False
+        self.frame_timeout = 0.12  # giây
 
         self.cb = pi.callback(gpio, pigpio.EITHER_EDGE, self._cb)
 
@@ -26,86 +20,82 @@ class IRCombinedDecoder:
         dt = pigpio.tickDiff(self.last_tick, tick)
         self.last_tick = tick
 
-        # Lưu pulse cho py-ir-remote
-        if self.in_frame:
-            self.pulses.append(dt)
-
-        # Bắt đầu khung tín hiệu nếu gặp cạnh FALLING
         if not self.in_frame and level == 0:
             self.in_frame = True
             self.pulses = []
-
-        # === Giải mã NEC thủ công bằng tickDiff giữa các cạnh FALLING ===
-        if level != 0:
             return
 
-        if dt < 100:
-            return  # Bỏ nhiễu
+        if self.in_frame:
+            self.pulses.append(dt)
 
-        if 7000 <= dt <= 12000:
-            print(f"[NEC] HEADER STARTED (dt = {dt} µs)")
-            self.in_code = True
-            self.bits = 0
-            self.code = 0
-            return
+    def decode_nec(self, pulses):
+        if len(pulses) < 66:
+            print("[DEBUG] Không đủ pulse NEC")
+            return None
 
-        if self.in_code:
-            if 1000 <= dt <= 1300:  # bit 0
-                self.code = (self.code << 1) | 0
-                self.bits += 1
-                print(f"[NEC] Bit {self.bits}: 0 (dt={dt})")
-            elif 2000 <= dt <= 2500:  # bit 1
-                self.code = (self.code << 1) | 1
-                self.bits += 1
-                print(f"[NEC] Bit {self.bits}: 1 (dt={dt})")
+        # Header
+        if not (8500 <= pulses[0] <= 9500 and 4000 <= pulses[1] <= 5000):
+            print("[DEBUG] Không phải header NEC hợp lệ")
+            return None
+
+        bits = []
+        for i in range(2, 66, 2):  # từng cặp (mark, space)
+            mark = pulses[i]
+            space = pulses[i + 1]
+
+            if 400 <= mark <= 700:
+                if 400 <= space <= 700:
+                    bits.append(0)
+                elif 1500 <= space <= 2500:
+                    bits.append(1)
+                else:
+                    print(f"[DEBUG] space lạ: {space} µs")
+                    return None
             else:
-                print(f"[NEC] Invalid pulse: dt = {dt} µs → Reset")
-                self.in_code = False
-                self.bits = 0
-                self.code = 0
-                return
+                print(f"[DEBUG] mark lạ: {mark} µs")
+                return None
 
-            if self.bits == 32:
-                print(f"✅ [NEC] Mã IR (thủ công): 0x{self.code:08X}")
-                self.in_code = False
+        if len(bits) != 32:
+            print("[DEBUG] Không đủ 32 bit")
+            return None
+
+        code = 0
+        for b in bits:
+            code = (code << 1) | b
+
+        return code
 
     def listen_and_decode(self):
         try:
             while True:
                 time.sleep(self.frame_timeout)
                 if self.in_frame and len(self.pulses) > 10:
-                    try:
-                        code = self.decoder.decode(self.pulses)
-                        if code:
-                            print(f"✅ [py-ir-remote] Mã IR: 0x{code:08X}")
-                        else:
-                            print("[py-ir-remote] Không giải mã được")
-                    except Exception as e:
-                        print(f"[ERROR] py-ir-remote decode fail: {e}")
+                    print(f"[DEBUG] Pulses thu được: {len(self.pulses)}")
+                    code = self.decode_nec(self.pulses)
+                    if code:
+                        print(f">> Mã IR: 0x{code:08X}")
                     self.pulses = []
                     self.in_frame = False
         except KeyboardInterrupt:
-            print("\n>> Đã thoát.")
+            print(">> Thoát.")
         finally:
             self.cb.cancel()
-
 
 def main():
     pi = pigpio.pi()
     if not pi.connected:
-        print("⛔ Không kết nối được pigpiod. Chạy `sudo pigpiod` trước.")
+        print("⛔ Chạy `sudo pigpiod` trước khi chạy script.")
         return
 
     pi.set_mode(IR_GPIO, pigpio.INPUT)
     pi.set_pull_up_down(IR_GPIO, pigpio.PUD_UP)
 
-    print(f">> Đang lắng nghe IR trên GPIO {IR_GPIO}...")
+    print(f">> Lắng nghe IR NEC trên GPIO {IR_GPIO}...")
 
-    listener = IRCombinedDecoder(pi, IR_GPIO)
-    listener.listen_and_decode()
+    decoder = NECDecoderPure(pi, IR_GPIO)
+    decoder.listen_and_decode()
 
     pi.stop()
-
 
 if __name__ == "__main__":
     main()
