@@ -123,3 +123,4 @@ class WakewordListener:
         self.pa = None
         self.porcupine.delete()
         print("🗑️ WakewordListener đã được hủy.")
+wakeword_listener = WakewordListener()
