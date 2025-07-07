@@ -2,7 +2,7 @@ from gtts import gTTS
 import os
 from config import PATH_MPG123
 def play_voice(mytext):
-    return
+    # return
     # Language for the speech
     language = 'vi'
 
@@ -15,5 +15,5 @@ def play_voice(mytext):
     # Optionally, play the audio file (requires an audio player)
     # os.system("start welcome.mp3") # For Windows
     # os.system("mpg321 welcome.mp3") # For Linux
-    os.system(PATH_MPG123+" ./welcome.mp3")
+    os.system(PATH_MPG123+" -o alsa -a hw:1,0 ./welcome.mp3")
     os.remove("./welcome.mp3")
