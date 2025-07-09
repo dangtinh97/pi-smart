@@ -14,5 +14,4 @@ simpleaudio
 adafruit-circuitpython-irremote
 adafruit-blinka
 adafruit-circuitpython-ssd1306
-socket
 subprocess
