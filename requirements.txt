@@ -12,4 +12,3 @@ pigpio
 requests
 simpleaudio
 adafruit-circuitpython-irremote
-pulseio
