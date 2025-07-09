@@ -1,67 +1,12 @@
-import board
-import busio
-import adafruit_ssd1306
-from PIL import Image, ImageDraw, ImageFont
-import time
+from luma.core.interface.serial import i2c, spi, pcf8574
+from luma.core.interface.parallel import bitbang_6800
+from luma.core.render import canvas
+from luma.oled.device import ssd1306, ssd1309, ssd1325, ssd1331, sh1106, sh1107, ws0010
 
-# Thiết lập I2C
-try:
-    i2c = busio.I2C(board.SCL, board.SDA)
-    print("I2C khởi tạo thành công")
-except Exception as e:
-    print(f"Lỗi khởi tạo I2C: {e}")
-    exit()
+# rev.1 users set port=0
+# substitute spi(device=0, port=0) below if using that interface
+# substitute bitbang_6800(RS=7, E=8, PINS=[25,24,23,27]) below if using that interface
+serial = i2c(port=1, address=0x3C)
 
-# Thử cả hai kích thước màn hình: 128x64 và 128x32
-for width, height in [(128, 64), (128, 32)]:
-    print(f"Thử kích thước {width}x{height}...")
-    try:
-        # Khởi tạo OLED
-        oled = adafruit_ssd1306.SSD1306_I2C(width, height, i2c, addr=0x3C)
-        print(f"OLED {width}x{height} khởi tạo thành công")
-
-        # Xóa màn hình
-        oled.fill(0)
-        oled.show()
-
-        # Tạo hình ảnh
-        image = Image.new("1", (oled.width, oled.height))
-        draw = ImageDraw.Draw(image)
-
-        # Tải font mặc định
-        try:
-            font = ImageFont.load_default()
-        except Exception as e:
-            print(f"Lỗi tải font: {e}")
-            exit()
-
-        # Vẽ văn bản kiểm tra
-        text = "Test OLED"
-        draw.text((0, 0), text, font=font, fill=255)
-
-        # Hiển thị
-        oled.image(image)
-        oled.show()
-        print(f"Hiển thị văn bản '{text}' trên màn hình {width}x{height}")
-
-        # Chờ 5 giây để kiểm tra
-        time.sleep(5)
-
-        # Xóa màn hình
-        oled.fill(0)
-        oled.show()
-        break  # Thoát nếu thành công
-    except Exception as e:
-        print(f"Lỗi với kích thước {width}x{height}: {e}")
-        if height == 32:  # Nếu cả hai kích thước đều lỗi
-            print("Kiểm tra địa chỉ I2C bằng 'i2cdetect -y 1' hoặc kết nối phần cứng")
-            exit()
-
-# Giữ màn hình
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("Dừng chương trình")
-    oled.fill(0)
-    oled.show()
+# substitute ssd1331(...) or sh1106(...) below if using that device
+device = ssd1306(serial)
