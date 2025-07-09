@@ -51,7 +51,7 @@ def send_repeat_code():
 try:
     print("Bắt đầu phát tín hiệu IR liên tục...")
     # Gửi mã NEC ban đầu (ví dụ: address=0xC1, command=0x00)
-    send_nec_code(0xc1, 0xe0)
+    send_nec_code(0xC1, 0xE0)
     time.sleep(0.108)  # Khoảng cách 108ms
 
     # Lặp lại tín hiệu lặp (repeat code) liên tục
