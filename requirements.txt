@@ -12,3 +12,4 @@ pigpio
 requests
 simpleaudio
 adafruit-circuitpython-irremote
+adafruit-blinka

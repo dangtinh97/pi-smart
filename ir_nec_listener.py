@@ -1,7 +1,8 @@
+import board
 import pulseio
 import adafruit_irremote
 
-IR_PIN = 26  # GPIO 26
+IR_PIN = board.D26  # GPIO 26
 ir_receiver = pulseio.PulseIn(IR_PIN, maxlen=120, idle_state=True)
 decoder = adafruit_irremote.GenericDecode()
 
