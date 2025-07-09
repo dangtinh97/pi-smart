@@ -47,11 +47,11 @@ def send_repeat_code():
     send_carrier(560)
     time.sleep(0.108 - 0.009 - 0.00225 - 0.00056)  # Khoảng cách 108ms giữa các repeat code
 
-
+# Địa chỉ: 0xc1, Lệnh: 0xe0
 try:
     print("Bắt đầu phát tín hiệu IR liên tục...")
     # Gửi mã NEC ban đầu (ví dụ: address=0xC1, command=0x00)
-    send_nec_code(0xC1, 0x00)
+    send_nec_code(0xc1, 0xe0)
     time.sleep(0.108)  # Khoảng cách 108ms
 
     # Lặp lại tín hiệu lặp (repeat code) liên tục
