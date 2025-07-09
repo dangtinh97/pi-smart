@@ -1,21 +1,23 @@
-import board
-import busio
-from adafruit_ssd1306 import SSD1306_I2C
+from luma.core.interface.serial import i2c
+from luma.oled.device import sh1106
 from PIL import Image, ImageDraw, ImageFont
 
-# Khởi tạo I2C + OLED
-i2c = busio.I2C(board.SCL, board.SDA)
-oled = SSD1306_I2C(128, 64, i2c)
+# Khởi tạo SH1106 I2C, rotate=2 (xoay ngược 180 độ nếu gắn lộn)
+serial = i2c(port=1, address=0x3C)
+device = sh1106(serial, rotate=2)
 
-# Hàm hiển thị nội dung
-def show_text(text):
-    oled.fill(0)  # clear screen
-    oled.show()
-
-    image = Image.new("1", (oled.width, oled.height))
+def show_text(text: str):
+    # Tạo ảnh trắng đen
+    image = Image.new("1", (device.width, device.height))
     draw = ImageDraw.Draw(image)
-    font = ImageFont.load_default()
-    draw.text((0, 0), text, font=font, fill=255)
 
-    oled.image(image)
-    oled.show()
+    # Font mặc định
+    font = ImageFont.load_default()
+
+    # Ghi text (nhiều dòng nếu cần)
+    lines = text.split('\n')
+    for i, line in enumerate(lines):
+        draw.text((0, i * 12), line, font=font, fill=255)
+
+    # Hiển thị lên màn
+    device.display(image)
