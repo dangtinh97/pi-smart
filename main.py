@@ -7,7 +7,7 @@ from datetime import datetime
 import subprocess
 app = FastAPI()
 
-start_system()
+# start_system()
 
 
 
