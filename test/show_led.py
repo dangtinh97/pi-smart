@@ -1,81 +1,63 @@
-import board
-import busio
-import adafruit_ssd1306
-from PIL import Image, ImageDraw, ImageFont
+from luma.core.interface.serial import i2c
+from luma.core.render import canvas
+from luma.oled.device import ssd1306
 import time
 
-# Thiết lập I2C
-try:
-    i2c = busio.I2C(board.SCL, board.SDA)
-    print("I2C khởi tạo thành công")
-except Exception as e:
-    print(f"Lỗi khởi tạo I2C: {e}")
-    print("Kiểm tra kết nối SDA (Pin 3), SCL (Pin 5), VCC, GND")
-    exit()
+# Thử các cấu hình: địa chỉ I2C và kích thước màn hình
+configs = [
+    (0x3C, 128, 64),
+    (0x3C, 128, 32),
+    (0x3D, 128, 64),
+    (0x3D, 128, 32)
+]
 
-# Thử cả hai kích thước màn hình và địa chỉ I2C
-for addr in [0x3C, 0x3D]:
-    for width, height in [(128, 64), (128, 32)]:
-        print(f"Thử địa chỉ I2C 0x{addr:02X}, kích thước {width}x{height}...")
-        try:
-            # Khởi tạo OLED
-            oled = adafruit_ssd1306.SSD1306_I2C(width, height, i2c, addr=addr)
-            print(f"OLED khởi tạo thành công: 0x{addr:02X}, {width}x{height}")
-
-            # Xóa màn hình
-            oled.fill(0)
-            oled.show()
-            time.sleep(1)  # Đợi để kiểm tra màn hình đen
-
-            # Tạo hình ảnh
-            image = Image.new("1", (width, height))
-            draw = ImageDraw.Draw(image)
-
-            # Tải font mặc định
-            try:
-                font = ImageFont.load_default()
-            except Exception as e:
-                print(f"Lỗi tải font: {e}")
-                continue
-
-            # Vẽ văn bản kiểm tra
-            text = "Test OLED"
-            draw.text((0, 0), text, font=font, fill=255)
-
-            # Hiển thị
-            oled.image(image)
-            oled.show()
-            print(f"Hiển thị '{text}' trên màn hình {width}x{height}")
-
-            # Chờ 5 giây để kiểm tra
-            time.sleep(5)
-
-            # Thử hiển thị toàn màn hình trắng
-            oled.fill(1)
-            oled.show()
-            print("Hiển thị toàn màn hình trắng")
-            time.sleep(2)
-
-            # Xóa lại màn hình
-            oled.fill(0)
-            oled.show()
-            print("Xóa màn hình")
-
-            break  # Thoát nếu thành công
-        except Exception as e:
-            print(f"Lỗi với địa chỉ 0x{addr:02X}, kích thước {width}x{height}: {e}")
-    else:
+device = None
+for addr, width, height in configs:
+    print(f"Thử địa chỉ I2C 0x{addr:02X}, kích thước {width}x{height}...")
+    try:
+        # Khởi tạo giao diện I2C và thiết bị SSD1306
+        serial = i2c(port=1, address=addr)
+        device = ssd1306(serial, width=width, height=height)
+        print(f"Khởi tạo OLED thành công: 0x{addr:02X}, {width}x{height}")
+        break
+    except Exception as e:
+        print(f"Lỗi với địa chỉ 0x{addr:02X}, kích thước {width}x{height}: {e}")
         continue
-    break
-else:
-    print("Không thể khởi tạo OLED. Kiểm tra kết nối phần cứng hoặc địa chỉ I2C.")
+
+if device is None:
+    print("Không thể khởi tạo OLED. Kiểm tra kết nối I2C hoặc địa chỉ bằng 'i2cdetect -y 1'.")
     exit()
 
-# Giữ màn hình hiển thị văn bản
 try:
+    # Xóa màn hình (toàn đen)
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, fill="black")
+    print("Xóa màn hình (toàn đen)")
+    time.sleep(2)
+
+    # Thử hiển thị toàn màn hình trắng
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, fill="white")
+    print("Hiển thị toàn màn hình trắng")
+    time.sleep(2)
+
+    # Xóa lại màn hình
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, fill="black")
+    print("Xóa màn hình")
+
+    # Hiển thị văn bản kiểm tra
     while True:
+        with canvas(device) as draw:
+            draw.text((0, 0), "Test OLED", fill="white")
+            draw.text((0, 16), "IR Code:", fill="white")
+            draw.text((0, 32), "02FD08F7", fill="white")
+        print("Hiển thị văn bản: Test OLED, IR Code: 02FD08F7")
         time.sleep(1)
 except KeyboardInterrupt:
     print("Dừng chương trình")
-    oled.fill(0)
-    oled.show()
+    # Xóa màn hình khi thoát
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, fill="black")
+except Exception as e:
+    print(f"Lỗi hiển thị: {e}")

@@ -15,3 +15,4 @@ adafruit-circuitpython-irremote
 adafruit-blinka
 adafruit-circuitpython-ssd1306
 pillow
+luma.oled
