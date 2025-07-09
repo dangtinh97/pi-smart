@@ -2,7 +2,7 @@ import pigpio
 import time
 
 # Thiết lập GPIO
-IR_TX_PIN = 26  # GPIO 26
+IR_TX_PIN = 13  # GPIO 26
 CARRIER_FREQ = 38000  # 38kHz
 
 # Kết nối với pigpiod
