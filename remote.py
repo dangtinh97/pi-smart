@@ -1,50 +1,63 @@
 import pigpio
 import time
 
-IR_GPIO = 13  # Chân GPIO hỗ trợ PWM (PIN 12 trên Pi)
+# Thiết lập GPIO
+IR_TX_PIN = 26  # GPIO 26
+CARRIER_FREQ = 38000  # 38kHz
 
+# Kết nối với pigpiod
 pi = pigpio.pi()
+if not pi.connected:
+    print("Không thể kết nối với pigpiod. Đảm bảo pigpiod đang chạy!")
+    exit()
 
-def send_nec(code):
-    marks = []
-    # NEC header: 9ms mark + 4.5ms space
-    marks += [1]*int(9000/26.3)
-    marks += [0]*int(4500/26.3)
+# Thiết lập chân GPIO làm đầu ra
+pi.set_mode(IR_TX_PIN, pigpio.OUTPUT)
 
-    # 32 bit data
-    for i in range(32):
-        bit = (code >> (31 - i)) & 1
-        marks += [1]*int(560/26.3)
-        if bit == 1:
-            marks += [0]*int(1690/26.3)
-        else:
-            marks += [0]*int(560/26.3)
 
-    # End pulse
-    marks += [1]*int(560/26.3)
+# Hàm tạo sóng carrier 38kHz
+def send_carrier(duration_us):
+    # Tạo sóng PWM 38kHz trong khoảng thời gian duration_us
+    pi.hardware_PWM(IR_TX_PIN, CARRIER_FREQ, 500000)  # 50% duty cycle
+    time.sleep(duration_us / 1000000.0)
+    pi.hardware_PWM(IR_TX_PIN, 0, 0)  # Tắt PWM
 
-    # Build waveform
-    wf = []
-    for b in marks:
-        if b == 1:
-            wf.append(pigpio.pulse(1 << IR_GPIO, 0, 13))
-            wf.append(pigpio.pulse(0, 1 << IR_GPIO, 13))
-        else:
-            wf.append(pigpio.pulse(0, 0, 560))  # space
 
-    pi.wave_add_generic(wf)
-    wid = pi.wave_create()
+# Hàm gửi tín hiệu NEC
+def send_nec_code(address, command):
+    # Header: 9ms bật + 4.5ms tắt
+    send_carrier(9000)
+    time.sleep(0.0045)
 
-    # Send repeatedly for 5 seconds
-    start_time = time.time()
-    while time.time() - start_time < 5:
-        pi.wave_send_once(wid)
-        while pi.wave_tx_busy():
-            time.sleep(0.01)
-        # Mỗi mã NEC thường có delay giữa 2 lần phát (khoảng 110ms)
-        time.sleep(0.11)
+    # Gửi 32 bit (address + ~address + command + ~command)
+    data = (address << 24) | ((255 - address) << 16) | (command << 8) | (255 - command)
+    for i in range(31, -1, -1):  # Gửi từ bit cao xuống thấp
+        bit = (data >> i) & 1
+        send_carrier(560)  # Xung 560µs
+        time.sleep(0.00168 if bit else 0.00056)  # Logic 1: 1680µs, Logic 0: 560µs
 
-    pi.wave_delete(wid)
+    # Kết thúc bằng xung 560µs
+    send_carrier(560)
 
-# Gửi mã "Power" của remote LG
-send_nec(0x20DF10EF)
+
+# Hàm gửi tín hiệu lặp (repeat code)
+def send_repeat_code():
+    send_carrier(9000)
+    time.sleep(0.00225)
+    send_carrier(560)
+    time.sleep(0.108 - 0.009 - 0.00225 - 0.00056)  # Khoảng cách 108ms giữa các repeat code
+
+
+try:
+    print("Bắt đầu phát tín hiệu IR liên tục...")
+    # Gửi mã NEC ban đầu (ví dụ: address=0xC1, command=0x00)
+    send_nec_code(0xC1, 0x00)
+    time.sleep(0.108)  # Khoảng cách 108ms
+
+    # Lặp lại tín hiệu lặp (repeat code) liên tục
+    while True:
+        send_repeat_code()
+except KeyboardInterrupt:
+    print("Dừng phát tín hiệu")
+    pi.hardware_PWM(IR_TX_PIN, 0, 0)  # Tắt PWM
+    pi.stop()
