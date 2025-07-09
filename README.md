@@ -47,3 +47,33 @@ pi-smart/
 │   └── ir_codes.json           # Mã lệnh IR đã học
 
 ```
+
+
+
+## Setup Auto Start
+- step1: create file  ```sudo nano /etc/systemd/system/pi-smart.service```
+- copy textplain to file create before 
+```textplain
+[Unit]
+Description=Pi Smart FastAPI Service
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/pi-smart
+ExecStart=/home/pi/pi-smart/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- active auto
+```plaintext
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable pi-smart
+sudo systemctl start pi-smart
+ 
+```
