@@ -17,7 +17,7 @@ def get_ip_wlan0():
         for line in output.splitlines():
             line = line.strip()
             if line.startswith("inet "):
-                return "ssh @pi:"+line.split()[1].split('/')[0]
+                return "ssh pi@"+line.split()[1].split('/')[0]
         return "No IP"
     except:
         return "No Wi-Fi"
