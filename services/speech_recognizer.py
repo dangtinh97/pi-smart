@@ -3,10 +3,6 @@
 import speech_recognition as sr
 import asyncio
 import threading
-#from core.event_bus import event_bus
-
-recognizer = sr.Recognizer()
-mic = sr.Microphone()
 from services.ai_agent import aiAgent
 def listen_and_recognize():
     import speech_recognition as sr
