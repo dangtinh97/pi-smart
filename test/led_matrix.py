@@ -7,7 +7,7 @@ import time
 # ================================
 LED_PIN = board.D18          # Chỉ dùng được GPIO18
 NUM_PIXELS = 64              # 8x8
-BRIGHTNESS = 0.2
+BRIGHTNESS = 0.05
 
 pixels = neopixel.NeoPixel(
     LED_PIN,
