@@ -59,7 +59,7 @@ if __name__ == "__main__":
     try:
         while True:
             for img in IMAGES:
-                draw_bitmap(img, fg=(0, 255, 0))  # Màu xanh lá
+                draw_bitmap(img, fg=(255, 105, 180))  # Màu xanh lá
                 time.sleep(0.5)
     except KeyboardInterrupt:
         clear()
