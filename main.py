@@ -5,6 +5,7 @@ from bootstrap import start_system
 from services.oled_display import show_text
 from datetime import datetime
 import subprocess
+import services.led_matrix
 app = FastAPI()
 
 start_system()
