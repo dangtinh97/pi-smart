@@ -2,7 +2,7 @@ import threading
 from core.event_bus import event_bus
 from wakeword.porcupine_listener import wakeword_listener
 from handlers.wakeword_handler import on_wakeword_detected
-
+from services.led_matrix import show_led_matrix
 def start_system():
     print("🚀 Khởi động hệ thống")
     wakeword_listener.start()
