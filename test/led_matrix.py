@@ -71,9 +71,10 @@ COLOR_PALETTE = [
 
 if __name__ == "__main__":
     try:
-        for color in COLOR_PALETTE:
-            for img in IMAGES:
-                draw_bitmap(img, fg=color)
-                time.sleep(0.4)
+        while True:
+            for color in COLOR_PALETTE:
+                for img in IMAGES:
+                    draw_bitmap(img, fg=color)
+                    time.sleep(0.4)
     except KeyboardInterrupt:
         clear()
