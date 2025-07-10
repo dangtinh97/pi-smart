@@ -23,14 +23,14 @@ def on_wakeword_detected(listener):
         global is_listening  # cần khai báo lại nếu gán
         try:
             print("🛑 Dừng WakewordListener để tránh xung đột mic...")
-            start_led_loop()
+            # start_led_loop()
             listener.stop()
             time.sleep(1.0)
             print("🔔 Wake word detected!")
             play_audio_wav("./data/sound.wav")
             print("🎙️ Bắt đầu ghi âm từ mic...")
             listen_and_recognize()
-            stop_led_loop()
+            # stop_led_loop()
         except Exception as e:
             print(f"🔥 Lỗi trong xử lý wakeword: {e}")
 
