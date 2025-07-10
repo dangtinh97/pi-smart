@@ -81,5 +81,7 @@ sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable pi-smart
 sudo systemctl start pi-smart
- 
+
+
+sudo systemctl stop pi-smart
 ```
