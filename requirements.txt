@@ -14,7 +14,5 @@ simpleaudio
 adafruit-blinka
 adafruit-circuitpython-irremote
 adafruit-circuitpython-ssd1306
-adafruit-circuitpython-neopixel
 pillow
 luma.oled
-rpi_ws281x
