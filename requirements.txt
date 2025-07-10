@@ -16,3 +16,5 @@ adafruit-blinka
 adafruit-circuitpython-ssd1306
 pillow
 luma.oled
+rpi_ws281x
+adafruit-circuitpython-neopixel
