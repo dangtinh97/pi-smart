@@ -11,10 +11,10 @@ RPi.GPIO
 pigpio
 requests
 simpleaudio
-adafruit-circuitpython-irremote
 adafruit-blinka
+adafruit-circuitpython-irremote
 adafruit-circuitpython-ssd1306
+adafruit-circuitpython-neopixel
 pillow
 luma.oled
 rpi_ws281x
-adafruit-circuitpython-neopixel
