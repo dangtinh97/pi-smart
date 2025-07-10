@@ -49,7 +49,6 @@ def draw_bitmap(bits, fg=(255, 255, 255), bg=(0, 0, 0)):
 IMAGES = [
     0x00183c7effffff66,  # Icon 1
     0x183c7effffff6600,  # Icon 2
-    0x0000000000000000,  # Icon trắng
 ]
 IMAGES_LEN = len(IMAGES)
 
