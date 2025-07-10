@@ -5,7 +5,6 @@ from services.play_audio import play_audio_wav
 from services.text_to_speech import play_voice
 from services.wakeword_listener import restart_wakeword_listener
 from services.speech_recognizer import listen_and_recognize
-from services.led_matrix import start_led_loop, stop_led_loop
 # Trạng thái ngăn chặn lắng nghe song song
 is_listening = False
 lock = threading.Lock()
