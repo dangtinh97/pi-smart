@@ -80,13 +80,10 @@ def fade_between_colors(img, c1, c2, steps=10, delay=0.05):
         draw_bitmap(img, fg=color)
         time.sleep(delay)
 
-if __name__ == "__main__":
-    try:
-        while True:
-            for i in range(len(COLOR_PALETTE)):
-                c1 = COLOR_PALETTE[i]
-                c2 = COLOR_PALETTE[(i + 1) % len(COLOR_PALETTE)]
-                for img in IMAGES:
-                    fade_between_colors(img, c1, c2, steps=10, delay=0.03)
-    except KeyboardInterrupt:
-        clear()
+def show_led_matrix():
+    while True:
+        for i in range(len(COLOR_PALETTE)):
+            c1 = COLOR_PALETTE[i]
+            c2 = COLOR_PALETTE[(i + 1) % len(COLOR_PALETTE)]
+            for img in IMAGES:
+                fade_between_colors(img, c1, c2, steps=10, delay=0.03)
