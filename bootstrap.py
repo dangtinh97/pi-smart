@@ -8,3 +8,4 @@ def start_system():
     wakeword_listener.start()
     # threading.Thread(target=wakeword_listener.start, daemon=True).start()
     event_bus.on("wakeword.detected", lambda: on_wakeword_detected(wakeword_listener))
+    threading.Thread(target=show_led_matrix, daemon=True).start()

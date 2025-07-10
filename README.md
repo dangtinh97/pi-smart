@@ -64,6 +64,12 @@ WorkingDirectory=/home/pi/pi-smart
 ExecStart=/home/pi/pi-smart/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 Restart=always
 Environment=PYTHONUNBUFFERED=1
+RestartSec=2
+User=root
+
+[Unit]
+StartLimitBurst=5
+StartLimitIntervalSec=20
 
 [Install]
 WantedBy=multi-user.target

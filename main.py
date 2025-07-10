@@ -7,7 +7,6 @@ from datetime import datetime
 import subprocess
 from services.led_matrix import show_led_matrix
 app = FastAPI()
-show_led_matrix()
 start_system()
 
 
