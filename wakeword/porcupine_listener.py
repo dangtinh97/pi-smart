@@ -5,7 +5,7 @@ import threading
 import time
 from core.event_bus import event_bus
 from config import ACCESS_KEY, KEYWORD_PATH
-
+from services.oled_display import show_text
 class WakewordListener:
     def __init__(self):
         self.porcupine = pvporcupine.create(
@@ -34,6 +34,7 @@ class WakewordListener:
         pa.terminate()
         if self.indexAudio is None:
             print("❌ Không tìm thấy mic USB. WakewordListener sẽ không hoạt động.")
+            show_text("Not found mic usb.")
 
     def start(self):
         if self.running:
