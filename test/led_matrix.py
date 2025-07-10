@@ -55,11 +55,25 @@ IMAGES_LEN = len(IMAGES)
 # ================================
 # DEMO HIỂN THỊ TUẦN TỰ
 # ================================
+
+COLOR_PALETTE = [
+    (255, 0, 0),       # Đỏ tươi
+    (255, 105, 180),   # Hồng (Hot Pink)
+    (255, 165, 0),     # Cam (Orange)
+    (255, 255, 0),     # Vàng
+    (0, 255, 0),       # Xanh lá
+    (0, 255, 255),     # Cyan
+    (0, 0, 255),       # Xanh dương
+    (138, 43, 226),    # Tím (BlueViolet)
+    (255, 0, 255),     # Magenta
+    (255, 255, 255),   # Trắng
+]
+
 if __name__ == "__main__":
     try:
-        while True:
+        for color in COLOR_PALETTE:
             for img in IMAGES:
-                draw_bitmap(img, fg=(255, 105, 180))  # Màu xanh lá
-                time.sleep(0.5)
+                draw_bitmap(img, fg=color)
+                time.sleep(0.4)
     except KeyboardInterrupt:
         clear()
