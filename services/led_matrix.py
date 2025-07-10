@@ -8,7 +8,7 @@ import time
 LED_PIN = board.D18          # Chỉ dùng được GPIO18
 NUM_PIXELS = 64              # 8x8
 BRIGHTNESS = 0.05
-
+RUNNING = False
 pixels = neopixel.NeoPixel(
     LED_PIN,
     NUM_PIXELS,
@@ -81,9 +81,25 @@ def fade_between_colors(img, c1, c2, steps=10, delay=0.05):
         time.sleep(delay)
 
 def show_led_matrix():
-    while True:
+    global RUNNING
+    while RUNNING:
         for i in range(len(COLOR_PALETTE)):
+            if not RUNNING:
+                break
             c1 = COLOR_PALETTE[i]
             c2 = COLOR_PALETTE[(i + 1) % len(COLOR_PALETTE)]
             for img in IMAGES:
+                if not RUNNING:
+                    break
                 fade_between_colors(img, c1, c2, steps=10, delay=0.03)
+    clear()  # Tắt LED khi dừng
+
+def start_led_loop():
+    global RUNNING
+    RUNNING = True
+    import threading
+    threading.Thread(target=show_led_matrix, daemon=True).start()
+
+def stop_led_loop():
+    global RUNNING
+    RUNNING = False
