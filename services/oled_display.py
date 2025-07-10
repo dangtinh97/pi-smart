@@ -5,27 +5,26 @@ from PIL import Image, ImageDraw, ImageFont
 # Khởi tạo SH1106 I2C, rotate=2 (xoay ngược 180 độ nếu gắn lộn)
 serial = i2c(port=1, address=0x3C)
 device = sh1106(serial, rotate=2)
+
+image = Image.new("1", (device.width, device.height))
+draw = ImageDraw.Draw(image)
+font = ImageFont.load_default()
 lineText=0
 def show_text(text: str):
     # Tạo ảnh trắng đen
-    global lineText
-    image = Image.new("1", (device.width, device.height))
-    draw = ImageDraw.Draw(image)
-
-    # Font mặc định
-    font = ImageFont.load_default()
-
-    # Ghi text (nhiều dòng nếu cần)
+    global lineText, draw, font, image
     lines = text.split('\n')
-    for i, line in enumerate(lines):
-        draw.text((0, i+lineText * 12), line, font=font, fill=255)
+    for line in lines:
+        if (lineText + 1) * 12 > device.height:
+            image = Image.new("1", (device.width, device.height))
+            draw = ImageDraw.Draw(image)
+            lineText = 0
+        draw.text((0, lineText * 12), line, font=font, fill=255)
         lineText += 1
-
-    # Hiển thị lên màn
     device.display(image)
 
 def clear_text():
-    global lineText
-    blank = Image.new("1", (device.width, device.height))
-    device.display(blank)
+    global lineText, draw, font, image
+    image = Image.new("1", (device.width, device.height))
+    device.display(image)
     lineText = 0
