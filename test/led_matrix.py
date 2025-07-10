@@ -68,13 +68,25 @@ COLOR_PALETTE = [
     (255, 0, 255),     # Magenta
     (255, 255, 255),   # Trắng
 ]
+def lerp_color(c1, c2, t):
+    """Nội suy màu giữa c1 và c2 với t từ 0.0 đến 1.0"""
+    return tuple(int(c1[i] + (c2[i] - c1[i]) * t) for i in range(3))
+
+def fade_between_colors(img, c1, c2, steps=10, delay=0.05):
+    """Hiệu ứng chuyển từ màu c1 sang c2 trên ảnh img"""
+    for i in range(steps + 1):
+        t = i / steps
+        color = lerp_color(c1, c2, t)
+        draw_bitmap(img, fg=color)
+        time.sleep(delay)
 
 if __name__ == "__main__":
     try:
         while True:
-            for color in COLOR_PALETTE:
+            for i in range(len(COLOR_PALETTE)):
+                c1 = COLOR_PALETTE[i]
+                c2 = COLOR_PALETTE[(i + 1) % len(COLOR_PALETTE)]
                 for img in IMAGES:
-                    draw_bitmap(img, fg=color)
-                    time.sleep(0.4)
+                    fade_between_colors(img, c1, c2, steps=10, delay=0.03)
     except KeyboardInterrupt:
         clear()
